@@ -6,7 +6,7 @@ const dotenv = require("dotenv");
 dotenv.config();
 
 const secret = process.env.WORD;
-console.log(secret);
+
 const sigHeaderName = "X-Hub-Signature-256";
 const sigHashAlg = "sha256";
 
