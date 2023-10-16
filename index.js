@@ -44,9 +44,6 @@ function verifyPostData(req, res, next) {
   return next();
 }
 
-// app.use(bodyParser.json());
-// app.use(bodyParser.urlencoded({ extended: false }));
-
 app.get("/healthcheck", function (req, res) {
   let sig =
     "sha1=" +
@@ -57,7 +54,8 @@ app.get("/healthcheck", function (req, res) {
 app.post("/fish", verifyPostData, function (req, res) {
   let data = req.body;
   console.log("data", data);
-  console.log("rawBody", req.rawBody);
+  const jsonResponse = JSON.parse(data);
+  console.log("json", jsonResponse);
   res.status(200).send("Request body was signed");
 });
 
