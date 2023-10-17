@@ -2,6 +2,7 @@ const crypto = require("crypto");
 const express = require("express");
 const bodyParser = require("body-parser");
 const dotenv = require("dotenv");
+const { simpleGit, CleanOptions } = require('simple-git');
 
 dotenv.config();
 
@@ -48,13 +49,14 @@ app.get("/healthcheck", function (req, res) {
   res.send("whatev");
 });
 
-app.post("/fish", verifyPostData, function (req, res) {
+app.post("/fish", verifyPostData, async function (req, res) {
   let data = req.body;
   // console.log("data", data);
   // const jsonResponse = JSON.parse(data);
   console.log('-------------------------------------------');
   console.log("repo", data.repository.full_name);
   console.log('-------------------------------------------');
+  await executeGitPull({repo: data?.repository?.full_name});
   res.status(200).send("Request body was signed");
 });
 
@@ -68,6 +70,24 @@ const port = 8008;
 app.listen(port, function () {
   console.log(`🚀 webhook server is running on ${port}!`);
 });
+
+
+async function executeGitPull({repo}) {
+  switch (repo.toLowerCase()) {
+    case 'bbohling/gh-wh-server':
+      console.log('🙌 made it to right spot! 🙌');
+      // simpleGit().clean(CleanOptions.FORCE);
+      const git = simpleGit(path.join(__dirname, '..', 'ghwh.brndn.me') );
+      await git.pull();
+      console.log('SUCCESSFUL PULL 🥳');
+      break;
+    default:
+      console.log('sad trombone!');
+      break;
+  }
+  return;
+}
+
 
 /*
 code largely from: https://gist.github.com/stigok/57d075c1cf2a609cb758898c0b202428
