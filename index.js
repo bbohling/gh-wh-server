@@ -53,9 +53,11 @@ app.get("/healthcheck", function (req, res) {
 
 app.post("/fish", verifyPostData, function (req, res) {
   let data = req.body;
-  console.log("data", data);
+  // console.log("data", data);
   // const jsonResponse = JSON.parse(data);
+  console.log('-------------------------------------------');
   console.log("repo", data.repository.full_name);
+  console.log('-------------------------------------------');
   res.status(200).send("Request body was signed");
 });
 
