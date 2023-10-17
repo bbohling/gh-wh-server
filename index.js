@@ -45,9 +45,6 @@ function verifyPostData(req, res, next) {
 }
 
 app.get("/healthcheck", function (req, res) {
-  let sig =
-    "sha1=" +
-    crypto.createHmac("sha1", secret).update(chunk.toString()).digest("hex");
   res.send("whatev");
 });
 
