@@ -52,11 +52,8 @@ app.get("/healthcheck", function (req, res) {
 
 app.post("/fish", verifyPostData, async function (req, res) {
   let data = req.body;
-  // console.log("data", data);
-  // const jsonResponse = JSON.parse(data);
-  console.log('-------------------------------------------');
-  console.log("repo", data.repository.full_name);
-  console.log('-------------------------------------------');
+  const dateTime = new Date().toISOString();
+  console.log(`${dateTime} :: ${data.repository.full_name}`);
   await executeGitPull({repo: data?.repository?.full_name});
   res.status(200).send("Request body was signed");
 });
@@ -74,13 +71,17 @@ app.listen(port, function () {
 
 
 async function executeGitPull({repo}) {
+  let git;
   switch (repo.toLowerCase()) {
     case 'bbohling/gh-wh-server':
-      console.log('🙌 made it to right spot! 🙌');
-      // simpleGit().clean(CleanOptions.FORCE);
-      const git = simpleGit(path.join(__dirname, '..', 'ghwh.brndn.me') );
+      git = simpleGit(path.join(__dirname, '..', 'ghwh.brndn.me') );
       await git.pull();
-      console.log('SUCCESSFUL PULL 🥳');
+      console.log('🥳 pull for bbohling/gh-wh-server success');
+      break;
+    case 'brycebohling/portfolio':
+      git = simpleGit(path.join(__dirname, '..', 'brycebohling.com') );
+      await git.pull();
+      console.log('🥳 pull for brycebohling/portfolio success');
       break;
     default:
       console.log('sad trombone!');
