@@ -94,7 +94,7 @@ async function executeGitPull({repo}) {
       console.log('🥳 pull for brycebohling/GemJunction success');
       break;
     default:
-      console.log('sad trombone!');
+      console.log('sad trombone!', repo?.toLowerCase());
       break;
   }
   return;
