@@ -93,6 +93,11 @@ async function executeGitPull({repo}) {
       await git.pull();
       console.log('🥳 pull for brycebohling/GemJunction success');
       break;
+    case 'brycebohling/magnet-game':
+      git = simpleGit(path.join(__dirname, '..', 'mm.brycebohling.com') );
+      await git.pull();
+      console.log('🥳 pull for brycebohling/magnet-game success');
+      break;
     default:
       console.log('sad trombone!', repo?.toLowerCase());
       break;
