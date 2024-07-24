@@ -78,6 +78,11 @@ async function executeGitPull({repo}) {
       await git.pull();
       console.log('🥳 pull for bbohling/gh-wh-server success');
       break;
+    case 'brycebohling/mow':
+      git = simpleGit(path.join(__dirname, '..', 'mow') );
+      await git.pull();
+      console.log('🥳 pull for brycebohling/mow success');
+      break;
     case 'brycebohling/portfolio':
       git = simpleGit(path.join(__dirname, '..', 'brycebohling.com') );
       await git.pull();
