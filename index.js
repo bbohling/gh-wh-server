@@ -79,9 +79,9 @@ async function executeGitPull({repo}) {
       console.log('🥳 pull for bbohling/gh-wh-server success');
       break;
     case 'brycebohling/mow':
-      git = simpleGit(path.join(__dirname, '..', 'mow') );
+      git = simpleGit(path.join(__dirname, '..', 'makerofworlds.dev') );
       await git.pull();
-      console.log('🥳 pull for brycebohling/mow success');
+      console.log('🥳 pull for brycebohling/makerofworlds.dev success');
       break;
     case 'brycebohling/portfolio':
       git = simpleGit(path.join(__dirname, '..', 'brycebohling.com') );
@@ -109,7 +109,6 @@ async function executeGitPull({repo}) {
   }
   return;
 }
-
 
 /*
 code largely from: https://gist.github.com/stigok/57d075c1cf2a609cb758898c0b202428
