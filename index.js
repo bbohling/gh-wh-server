@@ -86,6 +86,7 @@ async function executeGitPull({repo}) {
     case 'brycebohling/portfolio':
       git = simpleGit(path.join(__dirname, '..', 'brycebohling.com') );
       await git.pull();
+      await git.raw('lfs', 'pull').catch(console.log);
       console.log('🥳 pull for brycebohling/portfolio success');
       break;
     case 'brycebohling/bullet-blitz':
