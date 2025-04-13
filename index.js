@@ -4,6 +4,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const dotenv = require("dotenv");
 const { simpleGit, CleanOptions } = require('simple-git');
+const { exec } = require('child_process');
 
 dotenv.config();
 
@@ -98,6 +99,21 @@ async function executeGitPull({repo}) {
       git = simpleGit(path.join(__dirname, '..', 'ct.brycebohling.com') );
       await git.pull();
       console.log('🥳 pull for brycebohling/CrowdThought success');
+      // Navigate to the client folder and run `npm run build`
+      exec(
+        `cd ${path.join(__dirname, '..', 'ct.brycebohling.com', 'client')} && npm run build`,
+        (error, stdout, stderr) => {
+          if (error) {
+            console.error(`Error during npm run build: ${error.message}`);
+            return;
+          }
+          if (stderr) {
+            console.error(`stderr: ${stderr}`);
+          }
+          console.log(`stdout: ${stdout}`);
+          console.log('🎉 npm run build for brycebohling/CrowdThought success');
+        }
+      );
       break;
     case 'brycebohling/gemjunction':
       git = simpleGit(path.join(__dirname, '..', 'gemjunction.brycebohling.com') );
