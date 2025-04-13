@@ -94,7 +94,7 @@ async function executeGitPull({repo}) {
       await git.pull();
       console.log('🥳 pull for brycebohling/bullet-blitz success');
       break;
-    case 'brycebohling/CrowdThought':
+    case 'brycebohling/crowdthought':
       git = simpleGit(path.join(__dirname, '..', 'ct.brycebohling.com') );
       await git.pull();
       console.log('🥳 pull for brycebohling/CrowdThought success');
