@@ -115,6 +115,11 @@ async function executeGitPull({repo}) {
         }
       );
       break;
+    case 'brycebohling/DailyPlant':
+      git = simpleGit(path.join(__dirname, '..', 'advent.brycebohling.com') );
+      await git.pull();
+      console.log('🥳 pull for brycebohling/DailyPlant success');
+      break;
     case 'brycebohling/gemjunction':
       git = simpleGit(path.join(__dirname, '..', 'gemjunction.brycebohling.com') );
       await git.pull();
