@@ -48,7 +48,7 @@ function verifyPostData(req, res, next) {
 }
 
 app.get("/healthcheck", function (req, res) {
-  res.send("whatev");
+  res.status(200).send(secret);
 });
 
 app.post("/fish", verifyPostData, async function (req, res) {
@@ -78,6 +78,11 @@ async function executeGitPull({repo}) {
       git = simpleGit(path.join(__dirname, '..', 'ghwh.brndn.me') );
       await git.pull();
       console.log('🥳 pull for bbohling/gh-wh-server success');
+      break;
+    case 'bbohling/jotreps-app':
+      git = simpleGit(path.join(__dirname, '..', 'jotreps-app') );
+      await git.pull();
+      console.log('🥳 pull for bbohling/jotreps-app success');
       break;
     case 'brycebohling/mow':
       git = simpleGit(path.join(__dirname, '..', 'makerofworlds.dev') );
