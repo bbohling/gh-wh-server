@@ -48,7 +48,7 @@ function verifyPostData(req, res, next) {
 }
 
 app.get("/healthcheck", function (req, res) {
-  res.status(200).send(secret);
+  res.status(200).send("OK");
 });
 
 app.post("/fish", verifyPostData, async function (req, res) {
