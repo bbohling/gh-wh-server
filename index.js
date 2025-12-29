@@ -80,7 +80,7 @@ async function executeGitPull({repo}) {
       console.log('🥳 pull for bbohling/gh-wh-server success');
       break;
     case 'bbohling/jotreps-app':
-      git = simpleGit(path.join(__dirname, '..', 'jotreps-app') );
+      git = simpleGit(path.join(__dirname, '..', 'jotreps.com') );
       await git.pull();
       console.log('🥳 pull for bbohling/jotreps-app success');
       break;
