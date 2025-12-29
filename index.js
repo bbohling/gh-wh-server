@@ -84,7 +84,7 @@ async function executeGitPull({repo}) {
       await git.pull();
       console.log('🥳 pull for bbohling/jotreps-app success');
       exec(
-        `cd ${path.join(__dirname, '..', 'jotreps.com')} && bun run build`,
+        `cd ${path.join(__dirname, '..', 'jotreps.com')} && bun run --filter web build`,
         (error, stdout, stderr) => {
           if (error) {
             console.error(`Error during bun run build: ${error.message}`);
