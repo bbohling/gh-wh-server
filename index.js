@@ -83,6 +83,20 @@ async function executeGitPull({repo}) {
       git = simpleGit(path.join(__dirname, '..', 'jotreps.com') );
       await git.pull();
       console.log('🥳 pull for bbohling/jotreps-app success');
+      exec(
+        `cd ${path.join(__dirname, '..', 'jotreps.com')} && bun run build`,
+        (error, stdout, stderr) => {
+          if (error) {
+            console.error(`Error during bun run build: ${error.message}`);
+            return;
+          }
+          if (stderr) {
+            console.error(`stderr: ${stderr}`);
+          }
+          console.log(`stdout: ${stdout}`);
+          console.log('🎉 bun run build for bbohling/jotreps-app success');
+        }
+      );
       break;
     case 'brycebohling/mow':
       git = simpleGit(path.join(__dirname, '..', 'makerofworlds.dev') );
