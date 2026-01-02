@@ -10,8 +10,87 @@ dotenv.config();
 
 const secret = process.env.WORD;
 
+// Validate required environment variables at startup
+if (!secret) {
+  console.error('❌ FATAL: WORD environment variable is not set');
+  process.exit(1);
+}
+
 const sigHeaderName = "X-Hub-Signature-256";
 const sigHashAlg = "sha256";
+
+// Repository configuration
+const REPO_CONFIG = {
+  'bbohling/gh-wh-server': {
+    path: path.join(__dirname, '..', 'ghwh.brndn.me'),
+    buildCommand: null
+  },
+  'bbohling/jotreps-app': {
+    path: path.join(__dirname, '..', 'jotreps.com'),
+    buildCommand: 'bun run --filter web build'
+  },
+  'brycebohling/mow': {
+    path: path.join(__dirname, '..', 'makerofworlds.dev'),
+    buildCommand: null
+  },
+  'brycebohling/portfolio': {
+    path: path.join(__dirname, '..', 'brycebohling.com'),
+    buildCommand: null,
+    lfsEnabled: true
+  },
+  'brycebohling/bullet-blitz': {
+    path: path.join(__dirname, '..', 'bulletblitz.brycebohling.com'),
+    buildCommand: null
+  },
+  'brycebohling/crowdthought': {
+    path: path.join(__dirname, '..', 'ct.brycebohling.com'),
+    buildCommand: 'npm run build',
+    buildCwd: path.join(__dirname, '..', 'ct.brycebohling.com', 'client')
+  },
+  'brycebohling/dailyplant': {
+    path: path.join(__dirname, '..', 'advent.brycebohling.com'),
+    buildCommand: null
+  },
+  'brycebohling/gemjunction': {
+    path: path.join(__dirname, '..', 'gemjunction.brycebohling.com'),
+    buildCommand: null
+  },
+  'brycebohling/magnet-game': {
+    path: path.join(__dirname, '..', 'mm.brycebohling.com'),
+    buildCommand: null
+  }
+};
+
+// Helper function to promisify exec with error handling
+function executeCommand(command, cwd) {
+  return new Promise((resolve, reject) => {
+    exec(command, { cwd }, (error, stdout, stderr) => {
+      if (error) {
+        reject(new Error(`Command failed: ${error.message}\nstderr: ${stderr}`));
+        return;
+      }
+      if (stderr) {
+        console.error(`stderr: ${stderr}`);
+      }
+      if (stdout) {
+        console.log(`stdout: ${stdout}`);
+      }
+      resolve(stdout);
+    });
+  });
+}
+
+// Helper function to get repo configuration
+function getRepoConfig(repoName) {
+  const normalizedName = repoName.toLowerCase();
+  const config = REPO_CONFIG[normalizedName];
+  
+  if (!config) {
+    throw new Error(`Unknown repository: ${repoName}`);
+  }
+  
+  return { ...config, name: normalizedName };
+}
 
 const app = express();
 
@@ -72,88 +151,55 @@ app.listen(port, function () {
 
 
 async function executeGitPull({repo}) {
-  let git;
-  switch (repo.toLowerCase()) {
-    case 'bbohling/gh-wh-server':
-      git = simpleGit(path.join(__dirname, '..', 'ghwh.brndn.me') );
-      await git.pull();
-      console.log('🥳 pull for bbohling/gh-wh-server success');
-      break;
-    case 'bbohling/jotreps-app':
-      git = simpleGit(path.join(__dirname, '..', 'jotreps.com') );
-      await git.pull();
-      console.log('🥳 pull for bbohling/jotreps-app success');
-      exec(
-        `cd ${path.join(__dirname, '..', 'jotreps.com')} && bun run --filter web build`,
-        (error, stdout, stderr) => {
-          if (error) {
-            console.error(`Error during bun run build: ${error.message}`);
-            return;
-          }
-          if (stderr) {
-            console.error(`stderr: ${stderr}`);
-          }
-          console.log(`stdout: ${stdout}`);
-          console.log('🎉 bun run build for bbohling/jotreps-app success');
-        }
-      );
-      break;
-    case 'brycebohling/mow':
-      git = simpleGit(path.join(__dirname, '..', 'makerofworlds.dev') );
-      await git.pull();
-      console.log('🥳 pull for brycebohling/makerofworlds.dev success');
-      break;
-    case 'brycebohling/portfolio':
-      git = simpleGit(path.join(__dirname, '..', 'brycebohling.com') );
-      await git.pull();
-      await git.raw('lfs', 'pull').catch(console.log);
-      console.log('🥳 pull for brycebohling/portfolio success');
-      break;
-    case 'brycebohling/bullet-blitz':
-      git = simpleGit(path.join(__dirname, '..', 'bulletblitz.brycebohling.com') );
-      await git.pull();
-      console.log('🥳 pull for brycebohling/bullet-blitz success');
-      break;
-    case 'brycebohling/crowdthought':
-      git = simpleGit(path.join(__dirname, '..', 'ct.brycebohling.com') );
-      await git.pull();
-      console.log('🥳 pull for brycebohling/CrowdThought success');
-      // Navigate to the client folder and run `npm run build`
-      exec(
-        `cd ${path.join(__dirname, '..', 'ct.brycebohling.com', 'client')} && npm run build`,
-        (error, stdout, stderr) => {
-          if (error) {
-            console.error(`Error during npm run build: ${error.message}`);
-            return;
-          }
-          if (stderr) {
-            console.error(`stderr: ${stderr}`);
-          }
-          console.log(`stdout: ${stdout}`);
-          console.log('🎉 npm run build for brycebohling/CrowdThought success');
-        }
-      );
-      break;
-    case 'brycebohling/dailyplant':
-      git = simpleGit(path.join(__dirname, '..', 'advent.brycebohling.com') );
-      await git.pull();
-      console.log('🥳 pull for brycebohling/DailyPlant success');
-      break;
-    case 'brycebohling/gemjunction':
-      git = simpleGit(path.join(__dirname, '..', 'gemjunction.brycebohling.com') );
-      await git.pull();
-      console.log('🥳 pull for brycebohling/GemJunction success');
-      break;
-    case 'brycebohling/magnet-game':
-      git = simpleGit(path.join(__dirname, '..', 'mm.brycebohling.com') );
-      await git.pull();
-      console.log('🥳 pull for brycebohling/magnet-game success');
-      break;
-    default:
+  try {
+    // Get repository configuration
+    const config = getRepoConfig(repo);
+    
+    // Initialize git for the repository
+    const git = simpleGit(config.path);
+    
+    // Execute git pull
+    console.log(`Starting git pull for ${repo}...`);
+    await git.pull();
+    console.log(`🥳 pull for ${repo} success`);
+    
+    // Handle LFS if enabled
+    if (config.lfsEnabled) {
+      try {
+        await git.raw('lfs', 'pull');
+        console.log(`🥳 LFS pull for ${repo} success`);
+      } catch (lfsError) {
+        console.error(`⚠️  LFS pull failed for ${repo}: ${lfsError.message}`);
+        // Continue execution - LFS failure shouldn't block the entire process
+      }
+    }
+    
+    // Execute build command if configured
+    if (config.buildCommand) {
+      const buildCwd = config.buildCwd || config.path;
+      console.log(`Starting build for ${repo}...`);
+      
+      try {
+        await executeCommand(config.buildCommand, buildCwd);
+        console.log(`🎉 build for ${repo} success`);
+      } catch (buildError) {
+        console.error(`❌ Build failed for ${repo}: ${buildError.message}`);
+        throw buildError; // Re-throw to indicate failure
+      }
+    }
+    
+    return { success: true, repo };
+  } catch (error) {
+    // Handle unknown repository or other errors
+    if (error.message.includes('Unknown repository')) {
       console.log('sad trombone!', repo?.toLowerCase());
-      break;
+      return { success: false, repo, error: 'Unknown repository' };
+    }
+    
+    // Log the error and re-throw
+    console.error(`❌ Error processing ${repo}: ${error.message}`);
+    throw error;
   }
-  return;
 }
 
 /*
