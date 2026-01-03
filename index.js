@@ -158,12 +158,12 @@ async function executeGitPull({repo}) {
     // Initialize git for the repository
     const git = simpleGit(config.path);
     
-    // Execute git pull
+    // Execute git pull (await this - it's fast)
     console.log(`Starting git pull for ${repo}...`);
     await git.pull();
     console.log(`🥳 pull for ${repo} success`);
     
-    // Handle LFS if enabled
+    // Handle LFS if enabled (await this - it's relatively fast)
     if (config.lfsEnabled) {
       try {
         await git.raw('lfs', 'pull');
@@ -174,18 +174,19 @@ async function executeGitPull({repo}) {
       }
     }
     
-    // Execute build command if configured
+    // Execute build command asynchronously (don't await - can take minutes)
     if (config.buildCommand) {
       const buildCwd = config.buildCwd || config.path;
       console.log(`Starting build for ${repo}...`);
       
-      try {
-        await executeCommand(config.buildCommand, buildCwd);
-        console.log(`🎉 build for ${repo} success`);
-      } catch (buildError) {
-        console.error(`❌ Build failed for ${repo}: ${buildError.message}`);
-        throw buildError; // Re-throw to indicate failure
-      }
+      // Fire and forget with proper error handling
+      executeCommand(config.buildCommand, buildCwd)
+        .then(() => {
+          console.log(`🎉 build for ${repo} success`);
+        })
+        .catch((buildError) => {
+          console.error(`❌ Build failed for ${repo}: ${buildError.message}`);
+        });
     }
     
     return { success: true, repo };
