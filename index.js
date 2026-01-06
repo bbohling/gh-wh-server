@@ -27,7 +27,8 @@ const REPO_CONFIG = {
   },
   'bbohling/jotreps-app': {
     path: path.join(__dirname, '..', 'jotreps.com'),
-    buildCommand: 'bun run --filter web build'
+    buildCommand: 'bun run --filter web build',
+    buildBranch: 'main'
   },
   'brycebohling/mow': {
     path: path.join(__dirname, '..', 'makerofworlds.dev'),
@@ -134,7 +135,10 @@ app.post("/fish", verifyPostData, async function (req, res) {
   let data = req.body;
   const dateTime = new Date().toISOString();
   console.log(`${dateTime} :: ${data.repository.full_name}`);
-  await executeGitPull({repo: data?.repository?.full_name});
+  await executeGitPull({
+    repo: data?.repository?.full_name,
+    ref: data?.ref
+  });
   res.status(200).send("Request body was signed");
 });
 
@@ -150,10 +154,20 @@ app.listen(port, function () {
 });
 
 
-async function executeGitPull({repo}) {
+async function executeGitPull({repo, ref}) {
   try {
     // Get repository configuration
     const config = getRepoConfig(repo);
+    
+    // Extract branch name from ref (e.g., 'refs/heads/main' -> 'main')
+    const branch = ref?.split('/').pop();
+    
+    // Check if this branch should trigger builds
+    const allowedBranch = config.buildBranch || process.env.BUILD_BRANCH || 'main';
+    if (branch && branch !== allowedBranch) {
+      console.log(`⏭️  Skipping ${repo} - push on ${branch} (only building on ${allowedBranch})`);
+      return { success: true, skipped: true, repo, branch };
+    }
     
     // Initialize git for the repository
     const git = simpleGit(config.path);
