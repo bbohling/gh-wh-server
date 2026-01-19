@@ -32,6 +32,7 @@ const REPO_CONFIG = {
   },
   'bbohling/lifestream-ui': {
     path: path.join(__dirname, '..', 'brndn.me'),
+    buildCommand: 'npm run build',
     buildBranch: 'main'
   },
   'bbohling/lifestream-api': {
