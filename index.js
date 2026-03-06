@@ -30,6 +30,11 @@ const REPO_CONFIG = {
     buildCommand: 'bun run --filter web build',
     buildBranch: 'main'
   },
+  'bbohling/albohling': {
+    path: path.join(__dirname, '..', 'albohling.com'),
+    buildCommand: 'npm run build',
+    buildBranch: 'main'
+  },
   'bbohling/lifestream-ui': {
     path: path.join(__dirname, '..', 'brndn.me'),
     buildCommand: 'npm run build',
